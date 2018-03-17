@@ -6,74 +6,75 @@ const { stats, withMissingNode, withCircularDependencies } = require('./test-obj
 
 describe('LazyGraph', function() {
 
-    before(function() {
-        var lazyGraph;
-    });
-
-    beforeEach(function() {
-        lazyGraph = new LazyGraph();
-    });
-
     describe('receive(graph)', function() {
         it('should load the graph', function() {
+            const lazyGraph = new LazyGraph();
             lazyGraph.receive(stats);
             assert.deepEqual(stats, lazyGraph.graph);
         });
     });
 
-    describe('solve(vertex)', function() {
+    describe('solve(\'m2\')', function() {
 
-        before(function() {
-            var m2;
-        });
-
-        beforeEach(function() {
+        it('should compute m2', function() {
+            const lazyGraph = new LazyGraph();
             lazyGraph.receive(stats);
-            m2 = lazyGraph.solve('m2');
+            assert.notEqual(lazyGraph.solve('m2'), undefined);
         });
 
-        it('should compute the queried node', function() {
-            assert.notEqual(m2, undefined);
-        });
-
-        it('should compute required nodes', function() {
+        it('should compute nodes required by m2', function() {
+            const lazyGraph = new LazyGraph();
+            lazyGraph.receive(stats);
+            lazyGraph.solve('m2');
             assert.notEqual(lazyGraph.obj.n, undefined);
             assert.notEqual(lazyGraph.obj.xs, undefined);
         });
 
-        it('should not compute unneeded nodes', function() {
+        it('should not compute nodes not required by m2', function() {
+            const lazyGraph = new LazyGraph();
+            lazyGraph.receive(stats);
+            lazyGraph.solve('m2');
             assert.equal(lazyGraph.obj.m, undefined);
             assert.equal(lazyGraph.obj.v, undefined);
         });
 
-        it('should compute the queried node correctly', function() {
-            assert.equal(lazyGraph.obj.m2, 12.5);
+        it('should compute m2 correctly', function() {
+            const lazyGraph = new LazyGraph();
+            lazyGraph.receive(stats);
+            assert.equal(lazyGraph.solve('m2'), 12.5);
         });
 
-        it('should compute required nodes correctly', function() {
+        it('should compute nodes required by m2 correctly', function() {
+            const lazyGraph = new LazyGraph();
+            lazyGraph.receive(stats);
+            lazyGraph.solve('m2');
             assert.equal(lazyGraph.obj.n, 4);
+            assert.deepEqual(lazyGraph.obj.xs, [1, 2, 3, 6]);
         });
     });
 
-    describe('solve(vertex) when graph has a missing node', function() {
+    describe('solve(\'v\') when node m is missing', function() {
 
-        beforeEach(function() {
+        it('should throw an error', function() {
+            const lazyGraph = new LazyGraph();
             lazyGraph.receive(withMissingNode);
-        });
-
-        it('should throw an error when missing node is required', function() {
             assert.throws(
-                function() {
+                () => {
                     lazyGraph.solve('v');
                 },
                 Error,
                 "m is undefined"
             );
         });
+    });
 
-        it('should not throw an error when missing node is not required', function() {
+    describe('solve(\'m2\') when node m is missing', function() {
+
+        it('should not throw an error', function() {
+            const lazyGraph = new LazyGraph();
+            lazyGraph.receive(withMissingNode);
             assert.doesNotThrow(
-                function() {
+                () => {
                     lazyGraph.solve('m2');
                 },
                 Error
@@ -81,25 +82,28 @@ describe('LazyGraph', function() {
         });
     });
 
-    describe('solve(vertex) when graph has circular dependency', function() {
+    describe('solve(\'m2\') when m and m2 are dependent on each other', function() {
 
-        beforeEach(function() {
+        it('should throw an error', function() {
+            const lazyGraph = new LazyGraph();
             lazyGraph.receive(withCircularDependencies);
-        });
-
-        it('should throw an error when nodes dependent on each other are required', function() {
             assert.throws(
-                function() {
+                () => {
                     lazyGraph.solve('v');
                 },
                 Error,
                 'Dependency loop between m and m2'
             );
         });
+    });
 
-        it('should not throw an error when nodes dependent on each other are not required', function() {
+    describe('solve(\'n\') when m and m2 are dependent on each other', function() {
+
+        it('should not throw an error', function() {
+            const lazyGraph = new LazyGraph();
+            lazyGraph.receive(withCircularDependencies);
             assert.doesNotThrow(
-                function() {
+                () => {
                     lazyGraph.solve('n');
                 },
                 Error
@@ -120,6 +124,7 @@ describe('EagerGraph', function() {
 
     describe('receive(graph)', function() {
         it('should load the graph', function() {
+            const eagerGraph = new EagerGraph();
             eagerGraph.receive(stats);
             assert.deepEqual(stats, eagerGraph.lazy.graph);
         });
@@ -127,20 +132,10 @@ describe('EagerGraph', function() {
 
     describe('solve()', function() {
 
-        before(function() {
-            var solved;
-        });
-
-        beforeEach(function() {
+        it('should compute all the nodes of the graph', function() {
+            const eagerGraph = new EagerGraph();
             eagerGraph.receive(stats);
             solved = eagerGraph.solve();
-        });
-
-        it('should compute the queried node', function() {
-            assert.notEqual(solved.m2, undefined);
-        });
-
-        it('should compute all the nodes of the graph', function() {
             assert.notEqual(solved.xs, undefined);
             assert.notEqual(solved.n, undefined);
             assert.notEqual(solved.m, undefined);
@@ -148,11 +143,10 @@ describe('EagerGraph', function() {
             assert.notEqual(solved.v, undefined);
         });
 
-        it('should compute the queried node correctly', function() {
-            assert.equal(solved.m2, 12.5);
-        });
-
         it('should compute all the nodes of the graph correctly', function() {
+            const eagerGraph = new EagerGraph();
+            eagerGraph.receive(stats);
+            solved = eagerGraph.solve();
             assert.deepEqual(solved.xs, [1, 2, 3, 6]);
             assert.equal(solved.n, 4);
             assert.equal(solved.m, 3);
@@ -162,15 +156,13 @@ describe('EagerGraph', function() {
 
     });
 
-    describe('solve() when graph has a missing node', function() {
-
-        beforeEach(function() {
-            eagerGraph.receive(withMissingNode);
-        });
+    describe('solve() when node m is missing', function() {
 
         it('should throw an error', function() {
+            const eagerGraph = new EagerGraph();
+            eagerGraph.receive(withMissingNode);
             assert.throws(
-                function() {
+                () => {
                     eagerGraph.solve();
                 },
                 Error,
@@ -179,15 +171,13 @@ describe('EagerGraph', function() {
         });
     });
 
-    describe('solve() when graph has circular dependency', function() {
-
-        beforeEach(function() {
-            eagerGraph.receive(withCircularDependencies);
-        });
+    describe('solve() when m and m2 are dependent on each other', function() {
 
         it('should throw an error', function() {
+            const eagerGraph = new EagerGraph();
+            eagerGraph.receive(withCircularDependencies);
             assert.throws(
-                function() {
+                () => {
                     eagerGraph.solve();
                 },
                 Error,
