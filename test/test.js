@@ -58,13 +58,7 @@ describe('LazyGraph', function() {
         it('should throw an error', function() {
             const lazyGraph = new LazyGraph();
             lazyGraph.receive(withMissingNode);
-            assert.throws(
-                () => {
-                    lazyGraph.solve('v');
-                },
-                Error,
-                "m is undefined"
-            );
+            assert.throws(() => lazyGraph.solve('v'), Error, "m is undefined");
         });
     });
 
@@ -73,12 +67,7 @@ describe('LazyGraph', function() {
         it('should not throw an error', function() {
             const lazyGraph = new LazyGraph();
             lazyGraph.receive(withMissingNode);
-            assert.doesNotThrow(
-                () => {
-                    lazyGraph.solve('m2');
-                },
-                Error
-            );
+            assert.doesNotThrow(() => lazyGraph.solve('m2'), Error);
         });
     });
 
@@ -87,13 +76,7 @@ describe('LazyGraph', function() {
         it('should throw an error', function() {
             const lazyGraph = new LazyGraph();
             lazyGraph.receive(withCircularDependencies);
-            assert.throws(
-                () => {
-                    lazyGraph.solve('v');
-                },
-                Error,
-                'Dependency loop between m and m2'
-            );
+            assert.throws(() => lazyGraph.solve('v'), Error, 'Dependency loop between m and m2');
         });
     });
 
@@ -102,12 +85,7 @@ describe('LazyGraph', function() {
         it('should not throw an error', function() {
             const lazyGraph = new LazyGraph();
             lazyGraph.receive(withCircularDependencies);
-            assert.doesNotThrow(
-                () => {
-                    lazyGraph.solve('n');
-                },
-                Error
-            );
+            assert.doesNotThrow(() => lazyGraph.solve('n'), Error);
         });
     });
 });
@@ -161,13 +139,7 @@ describe('EagerGraph', function() {
         it('should throw an error', function() {
             const eagerGraph = new EagerGraph();
             eagerGraph.receive(withMissingNode);
-            assert.throws(
-                () => {
-                    eagerGraph.solve();
-                },
-                Error,
-                "m is undefined"
-            );
+            assert.throws(() => eagerGraph.solve(), Error, "m is undefined");
         });
     });
 
@@ -176,13 +148,7 @@ describe('EagerGraph', function() {
         it('should throw an error', function() {
             const eagerGraph = new EagerGraph();
             eagerGraph.receive(withCircularDependencies);
-            assert.throws(
-                () => {
-                    eagerGraph.solve();
-                },
-                Error,
-                'Dependency loop between m2 and m'
-            );
+            assert.throws(() => eagerGraph.solve(), Error, 'Dependency loop between m2 and m');
         });
     });
 });
