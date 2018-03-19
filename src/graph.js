@@ -78,5 +78,4 @@ function EagerGraph() {
     }
 }
 
-module.exports.LazyGraph = LazyGraph;
-module.exports.EagerGraph = EagerGraph;
+module.exports = { LazyGraph, EagerGraph };

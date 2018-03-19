@@ -46,6 +46,4 @@ var withCircularDependencies = {
     v: (m2, m) => m2 - m * m
 }
 
-module.exports.stats = stats;
-module.exports.withMissingNode = withMissingNode;
-module.exports.withCircularDependencies = withCircularDependencies;
+module.exports = { stats, withMissingNode, withCircularDependencies };
